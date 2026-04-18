@@ -1,0 +1,26 @@
+
+
+type IData<T> = {
+  success: boolean;
+  statusCode: number;
+  message?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    totalPage: number;
+    total: number;
+  };
+  data?: T;
+};
+
+const sendResponse = <T>(data: IData<T>) => {
+  const resData = {
+    success: data.success,
+    message: data.message,
+    pagination: data.pagination,
+    data: data.data,
+  };
+  return resData
+};
+
+export default sendResponse;
