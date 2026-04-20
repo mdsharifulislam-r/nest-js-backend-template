@@ -2,12 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './utlils/inspectors/logger.inspector';
 import { ValidationPipe } from '@nestjs/common';
-import { formatValidationErrors } from './utlils/errors/validator-error';
-import { config } from './utlils/config/config';
-import { ResponseInterceptor } from './utlils/inspectors/response.interceptor';
-import { Transport } from '@nestjs/microservices';
-import { connectKafkaMicroService } from './utlils/helper/connectKafkaRoot';
-
+import { formatValidationErrors } from './utlils/errors/validator-error';;
+import 'reflect-metadata';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule,{
@@ -25,6 +22,19 @@ async function bootstrap() {
   // await connectKafkaMicroService(app); // only for kafka microservice, if you have other microservices you can create separate function for each and call here
 
   // await app.startAllMicroservices(); // IMPORTANT
+
+
+
+  //documentation
+  const config = new DocumentBuilder()
+  .setTitle('My API')
+  .setVersion('1.0')
+  .addBearerAuth()
+  .build();
+
+const document = SwaggerModule.createDocument(app, config);
+
+SwaggerModule.setup('docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000,process.env.IP_ADDRESS || '0.0.0.0',()=>{
     console.log(`Server running on port ${process.env.PORT ?? 5000}`);
