@@ -58,6 +58,7 @@ export class User {
   @Column({
     type: 'json',
     nullable: true,
+    select: false,
   })
   authentication: Authentication;
   @BeforeInsert()
@@ -70,6 +71,13 @@ export class User {
       };
     }
   }
+
+  // createAt and updateAt columns
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }
 
 @Entity('reset_token')

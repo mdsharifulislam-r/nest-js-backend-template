@@ -19,11 +19,11 @@ export class AuthService {
     @InjectRepository(ResetToken)
     private resetTokenRepo: Repository<ResetToken>,
     private jwtService: JwtService,
-    private emailService: EmailService
+    private emailService: EmailService,
   ) {}
   async verifyOtp(payload: VerifyEmailDto) {
     const { email, oneTimeCode } = payload;
-    const user = await this.userRepo.findOne({ where: { email } });
+    const user = await this.userRepo.findOne({ where: { email },select:{id:true,name:true,email:true,password:true,verified:true,status:true,role:true,authentication:true} }) as User;
     if (!user) {
       throw new ApiError(HttpStatus.NOT_FOUND, 'User not found');
     };
@@ -73,7 +73,7 @@ export class AuthService {
   }
 
   async login(payload:LoginDto){
-    const user = await this.userRepo.findOne({where:{email:payload.email},select:{id:true,name:true,email:true,password:true,verified:true,status:true,role:true}}) as User
+    const user = await this.userRepo.findOne({where:{email:payload.email},select:{id:true,name:true,email:true,password:true,verified:true,status:true,role:true,authentication:true}}) as User
     if(!user){
       throw new ApiError(HttpStatus.NOT_FOUND,'User not found')
     }
@@ -127,7 +127,7 @@ export class AuthService {
     if(!resetToken){
       throw new ApiError(HttpStatus.NOT_FOUND,'Reset token not found')
     }
-    const user = await this.userRepo.findOne({where:{id:resetToken.userId},select:{id:true,name:true,email:true,password:true,verified:true,status:true,role:true}}) as User
+    const user = await this.userRepo.findOne({where:{id:resetToken.userId},select:{id:true,name:true,email:true,password:true,verified:true,status:true,role:true,authentication:true}}) as User
     if(!user){
       throw new ApiError(HttpStatus.NOT_FOUND,'User not found')
     }
@@ -148,7 +148,7 @@ export class AuthService {
     })
   }
   async changePassword(payload:ChangePasswordDto,userId:string){
-    const user = await this.userRepo.findOne({where:{id:userId},select:{id:true,name:true,email:true,password:true,verified:true,status:true,role:true}}) as User
+    const user = await this.userRepo.findOne({where:{id:userId},select:{id:true,name:true,email:true,password:true,verified:true,status:true,role:true,authentication:true}}) as User
     if(!user){
       throw new ApiError(HttpStatus.NOT_FOUND,'User not found')
     }
