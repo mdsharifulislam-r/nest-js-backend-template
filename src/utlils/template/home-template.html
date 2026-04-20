@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NESTU Control Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f1117;
+  --bg2: #161820;
+  --bg3: #1e2030;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #e8e8ec;
+  --text2: #9a9aac;
+  --text3: #5a5a6e;
+  --ok: #22c97a;
+  --warn: #f0a020;
+  --err: #e84040;
+  --info: #4a9eff;
+  --info-bg: rgba(74,158,255,0.12);
+  --ok-bg: rgba(34,201,122,0.12);
+  --warn-bg: rgba(240,160,32,0.12);
+  --err-bg: rgba(232,64,64,0.12);
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+
+body.light {
+  --bg: #f0f2f8;
+  --bg2: #ffffff;
+  --bg3: #e6e9f2;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #111220;
+  --text2: #5a5a6e;
+  --text3: #9a9aac;
+  --ok: #16a05e;
+  --warn: #c47a10;
+  --err: #c02020;
+  --info: #1a6ed8;
+  --info-bg: rgba(26,110,216,0.1);
+  --ok-bg: rgba(22,160,94,0.1);
+  --warn-bg: rgba(196,122,16,0.1);
+  --err-bg: rgba(192,32,32,0.1);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  padding: 24px;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ---- WRAP ---- */
+#wrap {
+  max-width: 900px;
+  margin: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--bg2);
+}
+
+/* ---- TOP BAR ---- */
+.top-bar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 36px; height: 36px;
+  background: var(--info-bg);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 3px;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 1px;
+  margin-top: 1px;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ok-bg);
+  color: var(--ok);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 99px;
+  border: 1px solid rgba(34,201,122,0.25);
+}
+
+.status-dot {
+  width: 7px; height: 7px;
+  background: var(--ok);
+  border-radius: 50%;
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+.theme-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.theme-btn:hover { background: var(--border); }
+
+/* ---- MAIN GRID ---- */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.panel {
+  background: var(--bg2);
+  padding: 20px 22px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.panel:nth-child(2n) { border-right: none; }
+
+.panel-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+/* ---- CLOCK ---- */
+.clock-display {
+  font-family: 'Courier New', monospace;
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.clock-date {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 8px;
+}
+
+/* ---- SERVICE HEALTH ---- */
+.service-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.service-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.service-name {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  letter-spacing: 0.3px;
+}
+.badge-ok   { background: var(--ok-bg);   color: var(--ok);   border: 1px solid rgba(34,201,122,0.2); }
+.badge-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(240,160,32,0.2); }
+.badge-err  { background: var(--err-bg);  color: var(--err);  border: 1px solid rgba(232,64,64,0.2); }
+
+/* ---- RESOURCE BARS ---- */
+.metric-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+
+.bar-track {
+  height: 5px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 13px;
+}
+.bar-track:last-child { margin-bottom: 0; }
+
+.bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1.2s ease;
+}
+
+.bar-cpu  { background: var(--info); }
+.bar-ram  { background: var(--ok); }
+.bar-disk { background: var(--warn); }
+.bar-net  { background: #b06aff; }
+
+/* ---- SPARKLINE ---- */
+.request-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 52px;
+}
+
+.rbar {
+  flex: 1;
+  background: var(--info-bg);
+  border: 1px solid rgba(74,158,255,0.2);
+  border-radius: 3px 3px 0 0;
+  transition: height 1.2s ease;
+}
+
+.spark-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text3);
+}
+
+/* ---- BOTTOM STATS ROW ---- */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-card {
+  background: var(--bg2);
+  padding: 16px 20px;
+  border-right: 1px solid var(--border);
+}
+.stat-card:last-child { border-right: none; }
+
+.stat-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.stat-num {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  line-height: 1.1;
+}
+
+.stat-delta {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+/* ---- LOG PANEL ---- */
+.log-panel {
+  background: var(--bg2);
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.log-entry {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.8;
+}
+.log-ok   { color: var(--ok); }
+.log-warn { color: var(--warn); }
+.log-err  { color: var(--err); }
+
+/* ---- FOOTER ---- */
+.footer {
+  background: var(--bg2);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--info-bg);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--info);
+}
+
+.author-name {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.sound-btn {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.sound-btn:hover { background: var(--bg3); }
+
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  .main-grid { grid-template-columns: 1fr; }
+  .panel { border-right: none; }
+  .bottom-row { grid-template-columns: 1fr; }
+  .stat-card { border-right: none; border-bottom: 1px solid var(--border); }
+  .clock-display { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div id="wrap">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-name">NESTU</div>
+        <div class="brand-sub">Control Panel v2.0</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span id="wsLabel">All systems nominal</span>
+      </div>
+      <button class="theme-btn" onclick="toggleTheme()">Toggle theme</button>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- CLOCK -->
+    <div class="panel">
+      <div class="panel-label">Live clock — BST</div>
+      <div class="clock-display" id="clock">--:--:--</div>
+      <div class="clock-date" id="clockDate">Bangladesh Standard Time</div>
+    </div>
+
+    <!-- SERVICE HEALTH -->
+    <div class="panel">
+      <div class="panel-label">Service health</div>
+      <div class="service-list">
+        <div class="service-row"><span class="service-name">API Gateway</span><span class="badge badge-ok" id="s-api">Online</span></div>
+        <div class="service-row"><span class="service-name">PostgreSQL</span><span class="badge badge-ok" id="s-db">Connected</span></div>
+        <div class="service-row"><span class="service-name">Kafka</span><span class="badge badge-ok" id="s-kafka">Running</span></div>
+        <div class="service-row"><span class="service-name">Redis</span><span class="badge badge-ok" id="s-redis">Active</span></div>
+        <div class="service-row"><span class="service-name">Worker Queue</span><span class="badge badge-ok" id="s-queue">Idle</span></div>
+      </div>
+    </div>
+
+    <!-- SYSTEM RESOURCES -->
+    <div class="panel">
+      <div class="panel-label">System resources</div>
+
+      <div class="metric-label"><span>CPU</span><span id="cpuVal">--</span></div>
+      <div class="bar-track"><div class="bar-fill bar-cpu" id="cpuBar" style="width:0%"></div></div>
+
+      <div class="metric-label"><span>RAM</span><span id="ramVal">--</span></div>
+      <div class="bar-track"><div class="bar-fill bar-ram" id="ramBar" style="width:0%"></div></div>
+
+      <div class="metric-label"><span>Disk I/O</span><span id="diskVal">--</span></div>
+      <div class="bar-track"><div class="bar-fill bar-disk" id="diskBar" style="width:0%"></div></div>
+
+      <div class="metric-label"><span>Network</span><span id="netVal">--</span></div>
+      <div class="bar-track"><div class="bar-fill bar-net" id="netBar" style="width:0%"></div></div>
+    </div>
+
+    <!-- SPARKLINE -->
+    <div class="panel">
+      <div class="panel-label">Request throughput (last 16s)</div>
+      <div class="request-row" id="sparkline"></div>
+      <div class="spark-footer">
+        <span>16s ago</span>
+        <span>Now</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="bottom-row">
+    <div class="stat-card">
+      <div class="stat-lbl">Requests / min</div>
+      <div class="stat-num" id="rpmStat">--</div>
+      <div class="stat-delta" id="rpmDelta"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Avg response (ms)</div>
+      <div class="stat-num" id="latStat">--</div>
+      <div class="stat-delta" id="latDelta"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Error rate</div>
+      <div class="stat-num" id="errStat">--</div>
+      <div class="stat-delta" id="errDelta"></div>
+    </div>
+  </div>
+
+  <!-- LOG FEED -->
+  <div class="log-panel">
+    <div class="panel-label">System log</div>
+    <div id="logFeed"></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="author-info">
+      <div class="avatar">MS</div>
+      <div class="author-name">MD Shariful Islam</div>
+    </div>
+    <button class="sound-btn" onclick="playSound()">🔊 Play sound</button>
+  </div>
+
+</div>
+
+<audio id="sound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.wav"></audio>
+
+<script>
+/* ---- CLOCK (BST) ---- */
+const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function updateClock() {
+  const bst = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }));
+  const h = String(bst.getHours()).padStart(2,'0');
+  const m = String(bst.getMinutes()).padStart(2,'0');
+  const s = String(bst.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = h+':'+m+':'+s;
+  document.getElementById('clockDate').textContent =
+    days[bst.getDay()]+', '+months[bst.getMonth()]+' '+bst.getDate()+', '+bst.getFullYear();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ---- SPARKLINE ---- */
+let sparkData = Array(16).fill(0).map(() => Math.floor(Math.random()*80+20));
+
+function buildSparkline() {
+  const el = document.getElementById('sparkline');
+  el.innerHTML = '';
+  const max = Math.max(...sparkData, 1);
+  sparkData.forEach(v => {
+    const b = document.createElement('div');
+    b.className = 'rbar';
+    b.style.height = Math.round((v / max) * 100) + '%';
+    el.appendChild(b);
+  });
+}
+buildSparkline();
+
+/* ---- METRICS ---- */
+let prevRpm = 0, prevLat = 0;
+
+function updateMetrics() {
+  const cpu  = Math.floor(Math.random()*55+20);
+  const ram  = Math.floor(Math.random()*40+35);
+  const disk = Math.floor(Math.random()*60+10);
+  const net  = Math.floor(Math.random()*45+5);
+
+  document.getElementById('cpuBar').style.width  = cpu  + '%';
+  document.getElementById('ramBar').style.width  = ram  + '%';
+  document.getElementById('diskBar').style.width = disk + '%';
+  document.getElementById('netBar').style.width  = net  + '%';
+  document.getElementById('cpuVal').textContent  = cpu  + '%';
+  document.getElementById('ramVal').textContent  = ram  + '%';
+  document.getElementById('diskVal').textContent = disk + '%';
+  document.getElementById('netVal').textContent  = net  + '%';
+
+  const rpm = Math.floor(Math.random()*800+400);
+  const lat = Math.floor(Math.random()*60+20);
+  const err = (Math.random()*2).toFixed(2);
+  const rpmD = rpm - prevRpm;
+  const latD = lat - prevLat;
+
+  document.getElementById('rpmStat').textContent = rpm.toLocaleString();
+  document.getElementById('latStat').textContent = lat;
+  document.getElementById('errStat').textContent = err + '%';
+
+  const rpmDelta = document.getElementById('rpmDelta');
+  rpmDelta.textContent = (rpmD >= 0 ? '+' : '') + rpmD + ' vs prev';
+  rpmDelta.style.color = rpmD >= 0 ? 'var(--ok)' : 'var(--err)';
+
+  const latDelta = document.getElementById('latDelta');
+  latDelta.textContent = (latD >= 0 ? '+' : '') + latD + 'ms vs prev';
+  latDelta.style.color = latD <= 0 ? 'var(--ok)' : 'var(--warn)';
+
+  const errDelta = document.getElementById('errDelta');
+  errDelta.textContent = parseFloat(err) < 1 ? 'Nominal' : 'Above threshold';
+  errDelta.style.color = parseFloat(err) < 1 ? 'var(--ok)' : 'var(--err)';
+
+  prevRpm = rpm; prevLat = lat;
+
+  sparkData.shift();
+  sparkData.push(rpm / 10);
+  buildSparkline();
+}
+setInterval(updateMetrics, 2000);
+updateMetrics();
+
+/* ---- SERVICE STATUS ---- */
+const serviceIds = ['s-api','s-db','s-kafka','s-redis','s-queue'];
+const okLabels   = ['Online','Active','Running','Connected','Idle','Healthy'];
+
+function updateServices() {
+  const ws = Math.random() > 0.15 ? 'All systems nominal' : 'Reconnecting...';
+  document.getElementById('wsLabel').textContent = ws;
+
+  serviceIds.forEach(id => {
+    if (Math.random() > 0.92) {
+      const isWarn = Math.random() > 0.5;
+      const el = document.getElementById(id);
+      el.className = 'badge ' + (isWarn ? 'badge-warn' : 'badge-ok');
+      el.textContent = isWarn ? 'Degraded' : okLabels[Math.floor(Math.random()*okLabels.length)];
+    }
+  });
+}
+setInterval(updateServices, 4000);
+
+/* ---- LOG FEED ---- */
+const logLines = [
+  ['ok',   '[API] GET /v2/health 200 OK 12ms'],
+  ['ok',   '[DB] Query executed in 4ms — 3 rows returned'],
+  ['warn', '[Kafka] Consumer lag 240ms on topic events'],
+  ['ok',   '[Redis] Cache hit ratio 98.4%'],
+  ['ok',   '[Auth] Token validated — user: shariful'],
+  ['warn', '[Worker] Queue depth 142 — scaling up'],
+  ['ok',   '[API] POST /v2/submit 201 Created 28ms'],
+  ['err',  '[Kafka] Partition leader re-elected'],
+  ['ok',   '[DB] Index scan optimised — 0.8ms'],
+  ['ok',   '[API] WebSocket connection established from 10.0.0.4'],
+];
+
+const logFeed = document.getElementById('logFeed');
+let logIdx = 0;
+
+function addLog() {
+  const [type, msg] = logLines[logIdx % logLines.length];
+  logIdx++;
+  const now = new Date();
+  const ts = String(now.getHours()).padStart(2,'0')+':'+
+             String(now.getMinutes()).padStart(2,'0')+':'+
+             String(now.getSeconds()).padStart(2,'0');
+  const d = document.createElement('div');
+  d.className = 'log-entry log-' + type;
+  d.textContent = ts + '  ' + msg;
+  logFeed.insertBefore(d, logFeed.firstChild);
+  if (logFeed.children.length > 6) logFeed.lastChild.remove();
+}
+addLog(); addLog(); addLog();
+setInterval(addLog, 3000);
+
+/* ---- THEME ---- */
+function toggleTheme() {
+  document.body.classList.toggle('light');
+}
+
+/* ---- SOUND ---- */
+function playSound() {
+  document.getElementById('sound').play();
+}
+</script>
+
+</body>
+</html>
